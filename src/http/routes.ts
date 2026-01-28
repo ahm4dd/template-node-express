@@ -1,20 +1,26 @@
 import { Router } from "express";
-import { notesController } from "./controllers/notes.controller.ts";
+import { NotesController } from "./controllers/notes.controller.js";
 
-const router = Router();
+type RouteDependencies = {
+  notesController: NotesController;
+};
 
-// Health check for liveness
-router.get("/healthz", (_req, res) => {
-  res.json({ ok: true });
-});
+export function createRoutes({ notesController }: RouteDependencies) {
+  const router = Router();
 
-// Readiness check for DB or other service availability. For now always true.
-router.get("/readyz", async (_req, res) => {
-  res.json({ ok: true });
-});
+  // Health check for liveness
+  router.get("/healthz", (_req, res) => {
+    res.json({ ok: true });
+  });
 
-// Notes endpoints
-router.post("/notes", notesController.create);
-router.get("/notes/:id", notesController.getOne);
+  // Readiness check for DB or other service availability. For now always true.
+  router.get("/readyz", async (_req, res) => {
+    res.json({ ok: true });
+  });
 
-export default router;
+  // Notes endpoints
+  router.post("/notes", notesController.create);
+  router.get("/notes/:id", notesController.getOne);
+
+  return router;
+}

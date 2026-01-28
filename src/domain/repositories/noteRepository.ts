@@ -1,4 +1,4 @@
-import { Note } from "../entities/note.ts";
+import { Note } from "../entities/note.js";
 
 /**
  * Abstraction for note persistence. Application code depends on

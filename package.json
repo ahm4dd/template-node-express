@@ -4,7 +4,7 @@
   "description": "Opinionated starter for Express backends with a clean architecture",
   "type": "module",
   "scripts": {
-    "dev": "nodemon --watch src --exec ts-node ./src/server.ts",
+    "dev": "node -e \"const { spawn, spawnSync } = require('node:child_process'); const tscPath = require.resolve('typescript/bin/tsc'); const initial = spawnSync(process.execPath, [tscPath, '-p', 'tsconfig.json'], { stdio: 'inherit' }); if (initial.status !== 0) process.exit(initial.status ?? 1); const tsc = spawn(process.execPath, [tscPath, '-w', '-p', 'tsconfig.json'], { stdio: 'inherit' }); const server = spawn(process.execPath, ['--watch', 'dist/server.js'], { stdio: 'inherit' }); const shutdown = (signal) => { tsc.kill(signal); server.kill(signal); }; process.on('SIGINT', () => shutdown('SIGINT')); process.on('SIGTERM', () => shutdown('SIGTERM'));\"",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/server.js",
     "test": "vitest"
@@ -14,10 +14,8 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@types/express": "^4.17.18",
+    "@types/express": "^5.0.6",
     "@types/node": "^20.10.6",
-    "nodemon": "^3.0.1",
-    "ts-node": "^10.9.2",
     "typescript": "^5.3.3",
     "vitest": "^4.0.0"
   }

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { AppError } from "../../shared/errors.ts";
-import { logger } from "../../config/logger.ts";
+import { AppError } from "../../shared/errors.js";
+import { logger } from "../../config/logger.js";
 
 /**
  * Centralized error handling middleware.

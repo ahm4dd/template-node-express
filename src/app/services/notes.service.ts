@@ -1,17 +1,12 @@
-import { NoteRepository } from "../../domain/repositories/noteRepository.ts";
-import { InMemoryNoteRepository } from "../../infra/repos/inMemory/noteRepository.ts";
-import { Note } from "../../domain/entities/note.ts";
+import { NoteRepository } from "../../domain/repositories/noteRepository.js";
+import { Note } from "../../domain/entities/note.js";
 
 /**
  * Application service for notes. Coordinates domain logic and
  * persistence via the repository abstraction.
  */
 export class NotesService {
-  private readonly repo: NoteRepository;
-
-  constructor(repo?: NoteRepository) {
-    this.repo = repo ?? new InMemoryNoteRepository();
-  }
+  constructor(private readonly repo: NoteRepository) {}
 
   /**
    * Creates a new note.

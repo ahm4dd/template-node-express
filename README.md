@@ -9,6 +9,7 @@ This repository is a **minimal but complete starter** for building backend APIs 
 - **Request identifiers**: every incoming request gets a unique ID (`src/http/middleware/requestId.ts`).
 - **Centralized logging**: simple logging abstraction (`src/config/logger.ts`) ready to swap for a structured logger.
 - **Error handling**: unified error classes and middleware (`src/shared/errors.ts`, `src/http/middleware/error.ts`).
+- **Dependency injection example**: controller and service wiring happens in the app factory to show clean composition.
 - **In-memory persistence**: a default in-memory repository for rapid development and testing, with a clear interface to swap in a real database implementation later.
 - **Health endpoints**: `GET /healthz` and `GET /readyz` for liveness and readiness checks.
 - **Vitest tests**: example unit test demonstrating how to test services.
@@ -21,13 +22,13 @@ template/
 ├── tsconfig.json       # TypeScript compiler options
 ├── README.md           # this file
 ├── src/
+│   ├── server.ts      # server startup
 │   ├── config/         # configuration and logger
 │   │   ├── env.ts
 │   │   └── logger.ts
 │   ├── http/
 │   │   ├── app.ts      # express app factory
 │   │   ├── routes.ts   # route definitions
-│   │   ├── server.ts   # server startup
 │   │   ├── middleware/
 │   │   │   ├── error.ts
 │   │   │   └── requestId.ts

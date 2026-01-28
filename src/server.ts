@@ -1,6 +1,6 @@
-import { createApp } from "./http/app.ts";
-import { env } from "./config/env.ts";
-import { logger } from "./config/logger.ts";
+import { createApp } from "./http/app.js";
+import { env } from "./config/env.js";
+import { logger } from "./config/logger.js";
 
 // Initialize the Express app
 const app = createApp();

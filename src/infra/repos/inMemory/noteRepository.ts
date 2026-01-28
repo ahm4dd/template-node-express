@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
-import { NoteRepository } from "../../../domain/repositories/noteRepository.ts";
-import { Note } from "../../../domain/entities/note.ts";
+import { NoteRepository } from "../../../domain/repositories/noteRepository.js";
+import { Note } from "../../../domain/entities/note.js";
 
 /**
  * In-memory implementation of the NoteRepository. Useful for tests
