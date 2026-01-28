@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { NotesService } from "../../app/services/notes.service.js";
 import { createNoteSchema } from "../../app/dto/notes.js";
-import { ValidationError, NotFoundError } from "../../shared/errors.js";
+import { ValidationError, NotFoundError, UnauthorizedError } from "../../shared/errors.js";
 
 /**
  * Notes HTTP controller.
@@ -19,6 +19,18 @@ export class NotesController {
     }
     const note = await this.notesService.createNote(parsed.data);
     return res.status(201).json(note);
+  };
+
+  createPrivate = async (req: Request, res: Response) => {
+    const parsed = createNoteSchema.safeParse(req.body);
+    if (!parsed.success) {
+      throw new ValidationError(JSON.stringify(parsed.error.issues));
+    }
+    if (!req.session) {
+      throw new UnauthorizedError("Authentication required");
+    }
+    const note = await this.notesService.createNote(parsed.data);
+    return res.status(201).json({ note, user: req.session.user });
   };
 
   getOne = async (req: Request, res: Response) => {

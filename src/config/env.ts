@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { z } from "zod";
 
 /**
@@ -9,23 +10,23 @@ import { z } from "zod";
  */
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
-  PORT: z
-    .string()
-    .optional()
-    .transform((val) => {
-      const parsed = parseInt(val || "3000", 10);
-      return isNaN(parsed) ? 3000 : parsed;
-    }),
+  PORT: z.coerce.number().int().positive().default(3000),
+  LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace"]).default("info"),
+  DATABASE_URL: z.string().url(),
+  NOTES_REPOSITORY: z.enum(["memory", "postgres"]).default("postgres"),
+  RABBITMQ_URL: z.string().url().optional(),
+  BETTER_AUTH_SECRET: z.string().min(32),
+  BETTER_AUTH_URL: z.string().url(),
 });
 
 export type Env = z.infer<typeof envSchema>;
 
-const result = envSchema.safeParse(process.env);
+const skipValidation = process.env.SKIP_ENV_VALIDATION === "true";
+const result = (skipValidation ? envSchema.partial() : envSchema).safeParse(process.env);
 
 if (!result.success) {
-  // eslint-disable-next-line no-console
   console.error("❌ Invalid environment variables", result.error.flatten().fieldErrors);
   process.exit(1);
 }
 
-export const env: Env = result.data;
+export const env: Env = result.data as Env;

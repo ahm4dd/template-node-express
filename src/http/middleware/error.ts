@@ -18,12 +18,12 @@ export function errorHandler(
 ) {
   const reqId = req.id;
   if (err instanceof AppError) {
-    logger.error(`[${reqId}]`, err.code, err.message);
+    logger.error({ reqId, code: err.code, err }, "Request failed");
     return res
       .status(err.httpStatus)
       .json({ error: err.code, message: err.message, requestId: reqId });
   }
-  logger.error(`[${reqId}]`, err);
+  logger.error({ reqId, err }, "Unhandled error");
   return res
     .status(500)
     .json({
