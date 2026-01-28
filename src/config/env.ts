@@ -1,5 +1,22 @@
-import "dotenv/config";
+import { config } from "dotenv";
+import { existsSync } from "node:fs";
+import { resolve } from "node:path";
 import { z } from "zod";
+
+const loadEnvFile = (filename: string, override = false) => {
+  const filePath = resolve(process.cwd(), filename);
+  if (existsSync(filePath)) {
+    config({ path: filePath, override });
+  }
+};
+
+// Load base env first so NODE_ENV can be set from .env
+loadEnvFile(".env");
+
+const nodeEnv = process.env.NODE_ENV ?? "development";
+loadEnvFile(`.env.${nodeEnv}`);
+loadEnvFile(".env.local", true);
+loadEnvFile(`.env.${nodeEnv}.local`, true);
 
 /**
  * Validate and export environment variables.

@@ -68,6 +68,39 @@ Key files:
 - `src/http/middleware/requireSession.ts` – session guard
 - `src/http/controllers/auth.controller.ts` – `GET /me`
 
+### How sessions work (in this template)
+
+- Better Auth stores **users, sessions, accounts, and verification records** in your database. The core tables include `user`, `session`, and `account`.
+- Sessions are stored in the DB and **session cookies** are sent to the browser. Cookies are signed with `BETTER_AUTH_SECRET`, are `httpOnly`, and are `secure` in production, with `SameSite=Lax` by default.
+- We use cookie-based sessions; the `/me` endpoint shows how to fetch the current session.
+
+### Where are the auth tables?
+
+By default, Better Auth uses the **PostgreSQL `public` schema**. You can check with:
+```
+psql postgresql://app:app@localhost:5432/app
+SHOW search_path;
+\dt
+```
+
+If you want auth tables under a separate schema (e.g. `auth`), you can configure `search_path` in the DB connection.
+
+### Admin panel / dashboard
+
+If you want a dashboard to manage users and sessions, an unofficial community‑built option is Better Auth Console (self‑hosted).
+
+Another option is the Better Auth Kit database explorer CLI for visualizing tables.
+
+### What auth features are missing?
+
+This template **only enables email/password** auth. You may want to add:
+- Email verification
+- Password reset flows
+- OAuth providers (Google/GitHub)
+- MFA / 2FA plugins
+
+These are supported by Better Auth, but intentionally not enabled here so you can add them when needed.
+
 ## Database (Postgres + Drizzle)
 
 - Schema: `src/infra/db/schema.ts`
@@ -136,6 +169,21 @@ docker compose up --build
 - `db` uses a named volume (`db-data`) so your data persists across restarts.
 - `api` depends on `db` and `rabbitmq` so it starts after those containers.
 - Use `docker compose down -v` if you want a clean reset (drops the database volume).
+
+## Multi‑env support
+
+The app automatically loads `.env` files in this order:
+
+1) `.env`
+2) `.env.{NODE_ENV}`
+3) `.env.local` (overrides)
+4) `.env.{NODE_ENV}.local` (overrides)
+
+This lets you keep base defaults in `.env`, environment‑specific values in `.env.production`, and local overrides in `.env.local`.
+
+## Production readiness
+
+See `PRODUCTION_GAPS.md` for everything that is **still missing** before a real production release.
 
 ## Project Structure
 
