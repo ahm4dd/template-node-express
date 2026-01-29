@@ -3,12 +3,12 @@ import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { z } from "zod";
 
-const loadEnvFile = (filename: string, override = false) => {
+function loadEnvFile(filename: string, override = false): void {
   const filePath = resolve(process.cwd(), filename);
   if (existsSync(filePath)) {
     config({ path: filePath, override });
   }
-};
+}
 
 // Load base env first so NODE_ENV can be set from .env
 loadEnvFile(".env");
@@ -44,11 +44,9 @@ const result = (skipValidation ? envSchema.partial() : envSchema).safeParse(proc
 if (!result.success) {
   const tree = z.treeifyError(result.error);
   const fieldErrors = Object.fromEntries(
-    Object.entries(tree.properties ?? {}).map(([key, value]) => [
-      key,
-      value.errors,
-    ]),
+    Object.entries(tree.properties ?? {}).map(([key, value]) => [key, value.errors]),
   );
+
   console.error("❌ Invalid environment variables", fieldErrors);
   process.exit(1);
 }

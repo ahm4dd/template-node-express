@@ -13,6 +13,7 @@ export class RabbitMQClient {
       throw new Error("RABBITMQ_URL is not configured");
     }
     if (!this.connection) {
+      // Lazily create connection and channel on first use.
       this.connection = await connect(env.RABBITMQ_URL);
       this.connection.on("error", (err) => {
         logger.error({ err }, "RabbitMQ connection error");
@@ -34,6 +35,7 @@ export class RabbitMQClient {
   }
 
   async publish(queue: string, payload: Record<string, unknown>) {
+    // Ensure queue exists and send a persistent message.
     const channel = await this.getChannel();
     await channel.assertQueue(queue, { durable: true });
     const body = Buffer.from(JSON.stringify(payload));
@@ -41,6 +43,7 @@ export class RabbitMQClient {
   }
 
   async consume(queue: string, handler: QueueHandler) {
+    // Consume messages with explicit ack/nack.
     const channel = await this.getChannel();
     await channel.assertQueue(queue, { durable: true });
     await channel.prefetch(1);

@@ -16,39 +16,67 @@ import { EventPublisher } from "../domain/events/eventPublisher.js";
 import { auth } from "../auth/auth.js";
 import { env } from "../config/env.js";
 
+type AppDependencies = {
+  controllers?: {
+    notes?: NotesController;
+    auth?: AuthController;
+  };
+  services?: {
+    notes?: NotesService;
+  };
+  repos?: {
+    notes?: NoteRepository;
+  };
+  publishers?: {
+    notes?: EventPublisher;
+  };
+};
+
 /**
  * Factory for creating the Express application instance.
  *
  * Attaches common middleware, routes, and error handling. A factory
  * function makes it easy to configure the app differently in tests.
  */
-type AppDependencies = {
-  notesController?: NotesController;
-  notesService?: NotesService;
-  notesRepository?: NoteRepository;
-  notesPublisher?: EventPublisher;
-  authController?: AuthController;
-};
-
 export function createApp(deps: AppDependencies = {}) {
+  // Repositories
   const notesRepository =
-    deps.notesRepository ??
+    deps.repos?.notes ??
     (env.NOTES_REPOSITORY === "postgres"
       ? new PostgresNoteRepository()
       : new InMemoryNoteRepository());
+
+  // Publishers
   const notesPublisher =
-    deps.notesPublisher ??
-    (env.RABBITMQ_URL ? new RabbitMQEventPublisher() : new NoopEventPublisher());
+    deps.publishers?.notes ??
+    (env.RABBITMQ_URL
+      ? new RabbitMQEventPublisher()
+      : new NoopEventPublisher());
+
+  // Services
   const notesService =
-    deps.notesService ?? new NotesService(notesRepository, notesPublisher);
-  const notesController = deps.notesController ?? new NotesController(notesService);
-  const authController = deps.authController ?? new AuthController();
-  const routes = createRoutes({ notesController, authController, requireSession });
+    deps.services?.notes ?? new NotesService(notesRepository, notesPublisher);
+
+  // Controllers
+  const notesController =
+    deps.controllers?.notes ?? new NotesController(notesService);
+
+  const authController =
+    deps.controllers?.auth ?? new AuthController();
+
+  const routes = createRoutes({
+    notesController,
+    authController,
+    requireSession,
+  });
+
   const app = express();
+
   app.use(requestId);
   app.all("/api/auth/*splat", toNodeHandler(auth));
   app.use(express.json());
-  app.use("/", routes);
+  app.use("/api/v1", routes);
   app.use(errorHandler);
+
   return app;
 }

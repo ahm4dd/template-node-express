@@ -1,6 +1,9 @@
 import { Router, type RequestHandler } from "express";
 import { NotesController } from "./controllers/notes.controller.js";
 import { AuthController } from "./controllers/auth.controller.js";
+import { createHealthRoutes } from "./routes/health.routes.js";
+import { createNotesRoutes } from "./routes/notes.routes.js";
+import { createAuthRoutes } from "./routes/auth.routes.js";
 
 type RouteDependencies = {
   notesController: NotesController;
@@ -15,23 +18,9 @@ export function createRoutes({
 }: RouteDependencies) {
   const router = Router();
 
-  // Health check for liveness
-  router.get("/healthz", (_req, res) => {
-    res.json({ ok: true });
-  });
-
-  // Readiness check for DB or other service availability. For now always true.
-  router.get("/readyz", async (_req, res) => {
-    res.json({ ok: true });
-  });
-
-  // Notes endpoints
-  router.post("/notes", notesController.create);
-  router.post("/notes/private", requireSession, notesController.createPrivate);
-  router.get("/notes/:id", notesController.getOne);
-
-  // Auth example: return current session if authenticated.
-  router.get("/me", requireSession, authController.me);
+  router.use(createHealthRoutes());
+  router.use(createNotesRoutes({ notesController, requireSession }));
+  router.use(createAuthRoutes({ authController, requireSession }));
 
   return router;
 }

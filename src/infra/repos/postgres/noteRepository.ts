@@ -18,6 +18,8 @@ export class PostgresNoteRepository implements NoteRepository {
         body: data.body,
       })
       .returning();
+
+    // Normalize nullable column to undefined in the domain model.
     return {
       ...created,
       body: created.body ?? undefined,
@@ -33,6 +35,8 @@ export class PostgresNoteRepository implements NoteRepository {
     if (!found) {
       return null;
     }
+
+    // Normalize nullable column to undefined in the domain model.
     return {
       ...found,
       body: found.body ?? undefined,

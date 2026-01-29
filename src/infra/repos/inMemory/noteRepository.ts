@@ -11,6 +11,7 @@ export class InMemoryNoteRepository implements NoteRepository {
 
   async create(data: { title: string; body?: string }): Promise<Note> {
     const id = randomUUID();
+
     const note: Note = {
       id,
       title: data.title,

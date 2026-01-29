@@ -59,20 +59,20 @@ npm run dev
 ## Auth (Better Auth)
 
 - Auth endpoints are mounted under `/api/auth/*`.
-- Example protected route: `GET /me` (returns session).
-- Example protected notes route: `POST /notes/private` (requires session).
+- Example protected route: `GET /api/v1/me` (returns session).
+- Example protected notes route: `POST /api/v1/notes/private` (requires session).
 - The auth handler is mounted **before** `express.json()` per Better Auth docs.
 
 Key files:
 - `src/auth/auth.ts` – Better Auth setup
 - `src/http/middleware/requireSession.ts` – session guard
-- `src/http/controllers/auth.controller.ts` – `GET /me`
+- `src/http/controllers/auth.controller.ts` – `GET /api/v1/me`
 
 ### How sessions work (in this template)
 
 - Better Auth stores **users, sessions, accounts, and verification records** in your database. The core tables include `user`, `session`, and `account`.
 - Sessions are stored in the DB and **session cookies** are sent to the browser. Cookies are signed with `BETTER_AUTH_SECRET`, are `httpOnly`, and are `secure` in production, with `SameSite=Lax` by default.
-- We use cookie-based sessions; the `/me` endpoint shows how to fetch the current session.
+- We use cookie-based sessions; the `/api/v1/me` endpoint shows how to fetch the current session.
 
 ### Where are the auth tables?
 
@@ -124,6 +124,23 @@ This template **only enables email/password** auth. You may want to add:
 - MFA / 2FA plugins
 
 These are supported by Better Auth, but intentionally not enabled here so you can add them when needed.
+
+### Password hashing (Argon2)
+
+This template configures Argon2id for email/password via Better Auth's
+custom password hasher hooks using the `argon2` package. See
+`src/auth/password.ts`.
+
+### Mobile / non-browser clients
+
+Cookie-based sessions are great for browsers. For native apps or services that
+can't or shouldn't use cookies, Better Auth provides bearer/JWT options so
+clients can send an `Authorization: Bearer <token>` header instead. See the
+Better Auth bearer/JWT plugin docs for guidance.
+
+## Style Guide
+
+See `STYLE_GUIDE.md` for coding conventions used throughout this template.
 
 ## Database (Postgres + Drizzle)
 

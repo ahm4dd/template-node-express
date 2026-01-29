@@ -1,5 +1,6 @@
 import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
+// Notes table definition (Drizzle schema).
 export const notes = pgTable("notes", {
   id: text("id").primaryKey(),
   title: text("title").notNull(),
@@ -9,5 +10,6 @@ export const notes = pgTable("notes", {
     .defaultNow(),
 });
 
+// Row types inferred from the schema.
 export type NoteRow = typeof notes.$inferSelect;
 export type NewNoteRow = typeof notes.$inferInsert;

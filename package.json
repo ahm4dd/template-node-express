@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "amqplib": "^0.10.9",
+    "argon2": "^0.44.0",
     "better-auth": "^1.4.17",
     "dotenv": "^17.2.3",
     "drizzle-orm": "^0.45.1",

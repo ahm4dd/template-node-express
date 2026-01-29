@@ -12,37 +12,46 @@ import { ValidationError, NotFoundError, UnauthorizedError } from "../../shared/
 export class NotesController {
   constructor(private readonly notesService: NotesService) {}
 
-  create = async (req: Request, res: Response) => {
+  async create(req: Request, res: Response) {
+    // Validate request payload.
     const parsed = createNoteSchema.safeParse(req.body);
     if (!parsed.success) {
       throw new ValidationError(JSON.stringify(parsed.error.issues));
     }
+
+    // Delegate to service layer.
     const note = await this.notesService.createNote(parsed.data);
     return res.status(201).json(note);
-  };
+  }
 
-  createPrivate = async (req: Request, res: Response) => {
+  async createPrivate(req: Request, res: Response) {
+    // Validate request payload.
     const parsed = createNoteSchema.safeParse(req.body);
     if (!parsed.success) {
       throw new ValidationError(JSON.stringify(parsed.error.issues));
     }
+
+    // Require authenticated session.
     if (!req.session) {
       throw new UnauthorizedError("Authentication required");
     }
+
+    // Delegate to service layer.
     const note = await this.notesService.createNote(parsed.data);
     return res.status(201).json({ note, user: req.session.user });
-  };
+  }
 
-  getOne = async (req: Request, res: Response) => {
+  async getOne(req: Request, res: Response) {
     const idParam = req.params.id;
     const id = Array.isArray(idParam) ? idParam[0] : idParam;
     if (!id) {
       throw new ValidationError("Missing note id");
     }
+
     const note = await this.notesService.getNote(id);
     if (!note) {
       throw new NotFoundError("Note not found");
     }
     return res.json(note);
-  };
+  }
 }

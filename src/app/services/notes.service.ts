@@ -18,6 +18,7 @@ export class NotesService {
    * Creates a new note.
    */
   async createNote(data: { title: string; body?: string }): Promise<Note> {
+    // Normalize and validate input.
     const title = data.title.trim();
     if (!title) {
       throw new ValidationError("Title is required");
@@ -30,11 +31,16 @@ export class NotesService {
       throw new ValidationError(`Body must be <= ${NOTE_BODY_MAX} characters`);
     }
     const normalizedBody = body && body.length > 0 ? body : undefined;
+
+    // Persist the note.
     const note = await this.repo.create({ title, body: normalizedBody });
+
+    // Publish a domain event for downstream consumers.
     await this.publisher.publish({
       type: "notes.created",
       payload: { id: note.id },
     });
+
     return note;
   }
 

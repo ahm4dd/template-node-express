@@ -33,8 +33,8 @@ describeE2E("Notes API (e2e)", () => {
 
     const repo = new PostgresNoteRepository(db);
     const app = createApp({
-      notesRepository: repo,
-      notesPublisher: new NoopEventPublisher(),
+      repos: { notes: repo },
+      publishers: { notes: new NoopEventPublisher() },
     });
     server = app.listen(0);
   });
@@ -47,13 +47,15 @@ describeE2E("Notes API (e2e)", () => {
 
   it("creates and fetches a note over HTTP", async () => {
     const createRes = await request(server)
-      .post("/notes")
+      .post("/api/v1/notes")
       .send({ title: "hello", body: "world" })
       .expect(201);
 
     const noteId = createRes.body.id;
 
-    const getRes = await request(server).get(`/notes/${noteId}`).expect(200);
+    const getRes = await request(server)
+      .get(`/api/v1/notes/${noteId}`)
+      .expect(200);
     expect(getRes.body.id).toBe(noteId);
     expect(getRes.body.title).toBe("hello");
   });

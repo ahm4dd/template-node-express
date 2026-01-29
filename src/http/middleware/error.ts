@@ -10,25 +10,21 @@ import { logger } from "../../config/logger.js";
  * leaking internals to the client. All errors are logged with the
  * request identifier for correlation.
  */
-export function errorHandler(
-  err: unknown,
-  req: Request,
-  res: Response,
-  _next: NextFunction,
-) {
+export function errorHandler(err: unknown, req: Request, res: Response, _next: NextFunction) {
   const reqId = req.id;
+
   if (err instanceof AppError) {
     logger.error({ reqId, code: err.code, err }, "Request failed");
     return res
       .status(err.httpStatus)
       .json({ error: err.code, message: err.message, requestId: reqId });
   }
+
   logger.error({ reqId, err }, "Unhandled error");
-  return res
-    .status(500)
-    .json({
-      error: "INTERNAL_SERVER_ERROR",
-      message: "Something went wrong",
-      requestId: reqId,
-    });
+
+  return res.status(500).json({
+    error: "INTERNAL_SERVER_ERROR",
+    message: "Something went wrong",
+    requestId: reqId,
+  });
 }
