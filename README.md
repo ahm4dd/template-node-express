@@ -91,6 +91,30 @@ If you want a dashboard to manage users and sessions, an unofficial community‑
 
 Another option is the Better Auth Kit database explorer CLI for visualizing tables.
 
+### Better Auth client (optional)
+
+If you have a frontend, Better Auth provides a client library (vanilla + framework adapters).
+
+Vanilla client:
+```
+import { createAuthClient } from "better-auth/client";
+
+export const authClient = createAuthClient({
+  baseURL: "http://localhost:3000",
+});
+```
+
+React client:
+```
+import { createAuthClient } from "better-auth/react";
+
+export const authClient = createAuthClient({
+  baseURL: "http://localhost:3000",
+});
+```
+
+If your frontend is on the same domain and uses the default `/api/auth` path, you can omit `baseURL`.
+
 ### What auth features are missing?
 
 This template **only enables email/password** auth. You may want to add:
@@ -108,6 +132,13 @@ These are supported by Better Auth, but intentionally not enabled here so you ca
 - Migrations: `drizzle/`
 - Repository: `src/infra/repos/postgres/noteRepository.ts`
 
+Note: if your Docker cache is corrupted, newer images can fail with `exec format error`.
+This template uses `postgres:18.1-alpine3.23`. You can override it via:
+```
+POSTGRES_IMAGE=postgres:18.1-bookworm docker compose up --build
+```
+If it still fails, purge Docker data and re-pull the image.
+
 Switch note persistence via env:
 ```
 NOTES_REPOSITORY=postgres   # or memory
@@ -118,6 +149,20 @@ NOTES_REPOSITORY=postgres   # or memory
 - Publisher: `src/infra/events/rabbitmqEventPublisher.ts`
 - Client: `src/infra/queue/rabbitmq.ts`
 - Worker example: `src/worker.ts`
+ 
+Note: the RabbitMQ management metrics collector is deprecated in recent versions.
+This template disables it to avoid relying on deprecated behavior. If you need
+the management UI charts, remove the setting in `rabbitmq.conf` and accept the
+deprecation warning, or rely on Prometheus metrics instead.
+
+### Docker platform note (Apple Silicon / ARM)
+
+By default, Docker pulls images for your machine's architecture. If you see `exec format error` when starting containers, force the platform for that run:
+```
+DOCKER_DEFAULT_PLATFORM=linux/amd64 docker compose up --build
+```
+
+On Apple Silicon, use `linux/arm64` instead.
 
 Build + run the worker:
 ```

@@ -16,7 +16,8 @@ describeIntegration("PostgresNoteRepository", () => {
   let pool: Pool;
 
   beforeAll(async () => {
-    container = await new PostgreSqlContainer("postgres:16")
+    const image = process.env.POSTGRES_TEST_IMAGE ?? "postgres:18.1-alpine3.23";
+    container = await new PostgreSqlContainer(image)
       .withDatabase("app")
       .withUsername("app")
       .withPassword("app")

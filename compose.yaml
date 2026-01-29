@@ -16,7 +16,8 @@ services:
       - db
       - rabbitmq
   db:
-    image: postgres:16
+    image: ${POSTGRES_IMAGE:-postgres:18.1-alpine3.23}
+    pull_policy: always
     environment:
       POSTGRES_USER: "${POSTGRES_USER:-app}"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-app}"
@@ -30,6 +31,8 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    volumes:
+      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
 
 volumes:
   db-data:
