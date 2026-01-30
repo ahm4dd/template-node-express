@@ -8,7 +8,7 @@ export async function requireSession(
   _res: Response,
   next: NextFunction,
 ) {
-  // Read session from Better Auth using request headers.
+  // Read session from Better Auth using request headers (cookies or bearer token).
   const session = await auth.api.getSession({
     headers: fromNodeHeaders(req.headers),
   });

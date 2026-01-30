@@ -34,6 +34,10 @@ const envSchema = z.object({
   RABBITMQ_URL: z.url().optional(),
   BETTER_AUTH_SECRET: z.string().min(32),
   BETTER_AUTH_URL: z.url(),
+  AUTH_SESSION_EXPIRES_IN: z.coerce.number().int().positive().default(60 * 60 * 24 * 7),
+  AUTH_SESSION_UPDATE_AGE: z.coerce.number().int().nonnegative().default(60 * 60 * 24),
+  AUTH_SESSION_FRESH_AGE: z.coerce.number().int().nonnegative().default(60 * 60 * 24),
+  AUTH_JWT_EXPIRATION: z.string().default("15m"),
 });
 
 export type Env = z.infer<typeof envSchema>;

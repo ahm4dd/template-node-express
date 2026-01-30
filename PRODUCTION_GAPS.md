@@ -15,6 +15,7 @@ This template is intentionally small. The items below are **not fully implemente
 - MFA / 2FA (Better Auth plugins)
 - Role-based access control (RBAC)
 - Admin interfaces / user management UI
+- OAuth2/OIDC refresh-token flows for third-party or long-lived clients (if needed)
 
 ## Observability
 - Centralized logs (ship Pino logs to a provider)
