@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { NotesService } from "../../app/services/notes.service.js";
 import { createNoteSchema } from "../../app/dto/notes.js";
-import { ValidationError, NotFoundError, UnauthorizedError } from "../../shared/errors.js";
+import { ValidationError, NotFoundError } from "../../shared/errors.js";
 
 /**
  * Notes HTTP controller.
@@ -31,14 +31,9 @@ export class NotesController {
       throw new ValidationError(JSON.stringify(parsed.error.issues));
     }
 
-    // Require authenticated session.
-    if (!req.session) {
-      throw new UnauthorizedError("Authentication required");
-    }
-
     // Delegate to service layer.
     const note = await this.notesService.createNote(parsed.data);
-    return res.status(201).json({ note, user: req.session.user });
+    return res.status(201).json({ note, user: req.session!.user });
   }
 
   async getOne(req: Request, res: Response) {
