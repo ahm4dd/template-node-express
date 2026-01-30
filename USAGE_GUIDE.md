@@ -85,6 +85,84 @@ node dist/server.js
 
 ---
 
+## 6.1) Better Auth Explained (What We Enabled)
+
+This template uses **Better Auth** as the auth engine. Here’s exactly what we
+configured and why.
+
+### What is Better Auth doing for us?
+
+- Handles **user accounts**, **sessions**, and **credential verification**
+- Stores auth data in Postgres
+- Exposes a set of ready‑made auth endpoints
+- Lets us plug in **bearer tokens** and **JWT issuance**
+
+### Files involved
+
+- `src/auth/auth.ts` – Better Auth setup (plugins, session config)
+- `src/auth/password.ts` – Argon2 hashing for email/password
+- `src/http/middleware/requireSession.ts` – checks session on protected routes
+- `src/http/app.ts` – mounts Better Auth handler at `/api/auth/*`
+
+### What we enabled
+
+1) **Email + Password login**
+   - `POST /api/auth/sign-up/email`
+   - `POST /api/auth/sign-in/email`
+   - `POST /api/auth/sign-out`
+
+2) **Session cookies (browser)**
+   - Session is stored in DB
+   - Cookie is `httpOnly`, `SameSite=Lax`
+   - Validated via `requireSession`
+
+3) **Bearer tokens (mobile/CLI)**
+   - A token is returned on sign‑in
+   - Clients send `Authorization: Bearer <token>`
+   - `requireSession` works with cookies or bearer
+
+4) **JWT plugin (service‑to‑service)**
+   - `GET /api/auth/token` → short‑lived JWT
+   - `GET /api/auth/jwks` → public keys for JWT verification
+
+### What we store in the DB
+
+Core tables created by Better Auth:
+
+- `user` – account records
+- `session` – active sessions
+- `account` – credential linkage
+- `verification` – email/password verification tokens
+- `jwks` – public/private key pairs for JWT signing
+
+### Why JWKS exists
+
+JWTs are signed with a private key. Other services need a **public key**
+to verify them. The JWKS endpoint publishes those public keys so external
+systems can trust the JWTs without sharing secrets.
+
+### Session timing (env variables)
+
+```
+AUTH_SESSION_EXPIRES_IN=604800
+AUTH_SESSION_UPDATE_AGE=86400
+AUTH_SESSION_FRESH_AGE=86400
+AUTH_JWT_EXPIRATION=15m
+```
+
+### What’s NOT enabled (yet)
+
+These are supported by Better Auth but intentionally not turned on:
+
+- Email verification flows
+- Password reset flows
+- OAuth providers (Google/GitHub)
+- MFA / WebAuthn
+
+You can add them later as needed.
+
+---
+
 ## 7) Curl Guide (All Available Endpoints)
 
 > These are real outputs captured from a working local run.
